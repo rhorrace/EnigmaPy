@@ -1,21 +1,36 @@
+from constants import LETTERS
+
+
 class Rotor:
-    def __init__(self):
-        self.wiring = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        self.turnover = ""
-        self.position = 0
+    def __init__(self, settings, offset=0):
+        self.base = LETTERS
+        self.sequence_default = settings[0]
+        self.sequence = settings[0]
+        self.notches = settings[1]
+        self.turnovers = settings[2]
+        self.offset = offset
+        self.turnover = False
 
-    def set_wiring(self, setting):
-        if not setting:
-            return
+    def forward(self, index):
+        return self.base.index(self.sequence[index])
 
-        if len(setting) != 26 or not setting.isalpha():
-            return
+    def reverse(self, index):
+        return self.sequence.index(self.base[index])
 
-        self.wiring = setting.upper()
+    def reset(self):
+        self.base = LETTERS
+        self.sequence = self.sequence_default
+        self.offset = 0
 
-    def set_turnover(self, letter):
-        self.turnover = letter
+    def ring_setting(self):
+        self.base = self.base[self.offset:] + self.base[:self.offset]
+        self.sequence = self.sequence[self.offset:] + self.sequence[:self.offset]
 
     def rotate(self):
-        self.wiring = self.wiring[-1] + self.writing[:-1]
-        self.position = (self.position + 1) % 26
+        self.base = self.base[1:] + self.base[:1]
+        self.sequence = self.sequence[1:] + self.sequence[:1]
+        self.offset = (self.offset + 1) % 26
+
+        if self.base[0] in self.turnovers:
+            self.turnover = True
+

@@ -1,4 +1,4 @@
-from constants import DEFAULT_MAP, LETTERS
+from constants import LETTERS
 
 
 class Entrywheel:

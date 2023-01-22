@@ -35,4 +35,3 @@ class Rotor:
 
         if self.base[self.offset] in self.turnovers:
             self.turnover = True
-

@@ -10,6 +10,8 @@ class Enigma:
         self.rotors = []
         self.reflector = {}
 
+        self.build_rotors(["III", "II", "I"])
+
     # Since Enigma should self-reciprocate, encoding and decoding is the same
     def encode_decode(self, letter):
         value = letter.upper()
@@ -30,11 +32,17 @@ class Enigma:
 
         # Go through rotors right-to-left
 
+        for rotor in reversed(self.rotors):
+            value = rotor.forward(value)
+
         # Go through reflector
 
         value = self.reflector[value]
 
         # Go through rotors left-to-right
+
+        for rotor in self.rotors:
+            value = rotor.reverse(value)
 
         # Go through entrywheel backwards
 
@@ -46,12 +54,12 @@ class Enigma:
 
         return value
 
-    def set_reflector(self, wiring=None):
-        if not wiring:
+    def set_reflector(self, letter=None):
+        if letter is None:
             self.reflector = DEFAULT_MAP
-            return
 
-        self.reflector = dict(zip(LETTERS, wiring))
+    def build_reflector(self, letter):
+        pass
 
     def set_plugboard(self, mapping=None):
         self.plugboard = DEFAULT_MAP
@@ -67,12 +75,28 @@ class Enigma:
         if not rotor_numbers:
             rotor_numbers = ["III", "II", "I"]
 
-        if len(rotor_numbers) not in [3,4]:
+        if len(rotor_numbers) not in [3, 4]:
             rotor_numbers = ["III", "II", "I"]
 
+        self.build_rotors(rotor_numbers)
+
     def build_rotors(self, rotor_numbers):
-        rotors = []
+        rotors = [None] * len(rotor_numbers)
+        rotor_details = []
+
         with open("rotors.csv", "r") as file:
             rotor_details = file.readlines()
-            rotor_details = list(map(lambda x: x.strip().split(","), rotor_details))
 
+        if not rotor_details:
+            raise Exception("Failed to retrieve rotor data.")
+
+        rotor_details = list(map(lambda x: x.strip().split(","), rotor_details))
+
+        for rotor in rotor_details:
+            if rotor[0] not in rotor_numbers:
+                continue
+
+            idx = rotor_numbers.index(rotor[0])
+            rotors[idx] = Rotor(rotor[1:])
+
+        self.rotors = rotors

@@ -9,7 +9,7 @@ class Rotor:
         self.notches = settings[1]
         self.turnovers = settings[2]
         self.offset = offset
-        self.turnover = False
+        self.turn = False
 
     def forward(self, letter):
         return self.sequence[self.base.index(letter)]
@@ -33,5 +33,4 @@ class Rotor:
         self.sequence = self.sequence[1:] + self.sequence[:1]
         self.offset = (self.offset + 1) % 26
 
-        if self.base[self.offset] in self.turnovers:
-            self.turnover = True
+        self.turn = self.base[self.offset] in self.turnovers

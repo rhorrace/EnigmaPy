@@ -1,4 +1,4 @@
-from constants import LETTERS, DEFAULT_MAP
+from constants import DEFAULT_MAP
 from entrywheel import Entrywheel
 from rotor import Rotor
 
@@ -21,6 +21,14 @@ class Enigma:
             return value
 
         # Rotate rotors
+        num_rotors = len(self.rotors)
+        self.rotors[-1].rotate()
+
+        for i in reversed(range(num_rotors - 1)):
+            if not self.rotors[i+1].turn:
+                continue
+
+            self.rotors[i].rotate()
 
         # Go through plugboard
 
@@ -54,12 +62,22 @@ class Enigma:
 
         return value
 
-    def set_reflector(self, letter=None):
-        if letter is None:
-            self.reflector = DEFAULT_MAP
+    def set_reflector(self, letters=None):
+        self.reflector = letters if letters else DEFAULT_MAP
 
     def build_reflector(self, letter):
-        pass
+        reflector_details = []
+
+        with open("reflectors.csv", "r") as file:
+            reflector_details = file.readlines()
+
+        if not reflector_details:
+            raise Exception("Failed to retrieve reflector data")
+
+        reflectors = dict(map(lambda x: tuple(x.strip().split(",")), reflector_details))
+        letters = None if letter not in reflectors else reflectors[letter]
+
+        self.set_reflector(letters)
 
     def set_plugboard(self, mapping=None):
         self.plugboard = DEFAULT_MAP
@@ -72,11 +90,12 @@ class Enigma:
             self.plugboard[pair[1]] = pair[0]
 
     def set_rotors(self, rotor_numbers=None):
+        default = ["III", "II", "I"]
         if not rotor_numbers:
-            rotor_numbers = ["III", "II", "I"]
+            rotor_numbers = default
 
         if len(rotor_numbers) not in [3, 4]:
-            rotor_numbers = ["III", "II", "I"]
+            rotor_numbers = default
 
         self.build_rotors(rotor_numbers)
 

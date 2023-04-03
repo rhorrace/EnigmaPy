@@ -23,7 +23,7 @@ class Rotor:
 
     def ring_setting(self, offset):
         if offset < 0 or offset >= 26:
-            raise ValueError("Error: offset must between 0 and 25")
+            raise ValueError("Error: offset must be between 0 and 25")
 
         self.reset()
         self.offset = offset
